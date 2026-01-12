@@ -9,7 +9,7 @@ using MelonLoader;
 namespace ICE_ipelago{
     public class Plugin:MelonMod{
         public const string ModName = "Archipelago";
-        public const string Version = "0.5.0";
+        public const string Version = "0.6.0";
         public const string Author = "Root";
         public static ArchipelagoSession session;
         public static Plugin instance;
