@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using MelonLoader;
@@ -11,6 +13,13 @@ namespace ICE_ipelago{
         public const string Author = "Root";
         public static ArchipelagoSession session;
         public static Plugin instance;
+        public static DeathLinkService deathLink;
+        public static bool doDeathLink = false;
+        public static bool deathLinkEnabled = false;
+        public static string slotName;
+        public static int goal = 20;
+        public static bool hard = false;
+        public Dictionary<string, object> SlotData;
 
         public override void OnEarlyInitializeMelon(){
             LoggerInstance.Msg("Loaded!!!");
@@ -29,9 +38,11 @@ namespace ICE_ipelago{
         {
             LoggerInstance.Msg("Connecting");
             APSaveManager.LoadSlot(user);
+            slotName = user;
             session = ArchipelagoSessionFactory.CreateSession(server);
             session.Socket.SocketClosed += reason => ConnectionMenu.Active = true;
             session.Items.ItemReceived += OnItemReceived;
+            deathLink = session.CreateDeathLinkService();
             LoginResult result;
 
             try
@@ -66,6 +77,21 @@ namespace ICE_ipelago{
             var loginSuccess = (LoginSuccessful)result;
             MelonLogger.Msg($"Successfully connected to {server}");
             ConnectionMenu.Active = false;
+            SlotData = loginSuccess.SlotData;
+            
+            if(SlotData.TryGetValue("death_link", out object dl) && (bool)dl){
+                deathLink.EnableDeathLink();
+                deathLink.OnDeathLinkReceived += OnDeathLink;
+                deathLinkEnabled = true;
+            }
+            hard = SlotData.TryGetValue("hard_only", out object hd) && (bool)hd;
+            goal = SlotData.TryGetValue("goal", out object g) ? (int)g : 20;
+        }
+
+        private void OnDeathLink(DeathLink link){
+            doDeathLink = true;
+            MelonLogger.MsgPastel(System.ConsoleColor.Magenta, link.Cause ?? link.Source + " died");
+            Singleton<PlayerStatsManager>.Instance?.AddHealth(-999999);
         }
 
         private void OnItemReceived(ReceivedItemsHelper helper){
@@ -143,7 +169,23 @@ namespace ICE_ipelago{
                 }
             } else{
                 //TODO: handle filler items here.
-                MelonLogger.Msg($"Item {itemName} not found");
+                switch(itemName){
+                    case "Damage Multiplier":
+                        ShipPatch.damage++;
+                        break;
+                    case "Projectile Size Multiplier":
+                        ShipPatch.size++;
+                        break;
+                    case "Projectile Speed Multiplier":
+                        ShipPatch.speed++;
+                        break;
+                    case "Score Multiplier":
+                        //TODO: implement;
+                        break;
+                    default:
+                        MelonLogger.Msg($"Item {itemName} not found");
+                        break;
+                }
             }
 
             helper.DequeueItem();

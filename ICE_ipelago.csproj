@@ -4,9 +4,6 @@
     <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
 
     <PropertyGroup>
-        <PublicizeAll>true</PublicizeAll>
-    </PropertyGroup>
-    <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{B727ABFD-06DF-417E-893B-D30DCAB9915E}</ProjectGuid>
@@ -76,15 +73,18 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Publicize Include="Assembly-CSharp" />
+    </ItemGroup>
+    <ItemGroup>
         <Compile Include="APSave.cs" />
         <Compile Include="CardPickPatch.cs" />
         <Compile Include="CheckManager.cs" />
         <Compile Include="ConnectionMenu.cs" />
-        <Compile Include="DraftPatch.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="APSaveManager.cs" />
         <Compile Include="ShipManager.cs" />
+        <Compile Include="ShipPatch.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

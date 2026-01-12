@@ -125,5 +125,11 @@ namespace ICE_ipelago{
 
             return false;
         }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(AchievementsManager), nameof(AchievementsManager.UnlockAchievement))]
+        public static bool DisableAchievements(){
+            return false;
+        }
     }
 }
